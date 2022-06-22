@@ -15,7 +15,129 @@ suspend fun main() {
 
 class Solution{
   fun print():Any{
-    return dailyTemperatures(intArrayOf(73,74,75,71,69,72,76,73))
+    return reconstructQueue(arrayOf(intArrayOf(7,0), intArrayOf(4,4), intArrayOf(7,1),intArrayOf(5,0),intArrayOf(6,1),intArrayOf(5,2)))
+  }
+
+  fun reconstructQueue(people: Array<IntArray>): Array<IntArray> {
+    people.sortWith(compareBy({it[0]}, {-it[1]}))
+    val result = Array(people.size){ intArrayOf(-1,-1)}
+    for (p in people){
+      var count = -1
+      var index = 0
+      while (index < people.size){
+        if (result[index][0] < 0){
+          count++
+        }
+        if (count >= p[1]){
+          break
+        }
+        index++
+      }
+      result[index--] = p
+    }
+    return result
+  }
+
+  fun combinationSum(candidates: IntArray, target: Int): List<List<Int>> {
+    if (candidates.isEmpty()) return emptyList()
+    val result = ArrayList<List<Int>>()
+    getSample(candidates, target, 0, 0, LinkedList<Int>(), result)
+    return result
+  }
+
+  fun getSample(candidates: IntArray, target: Int, index: Int, sum: Int, list: LinkedList<Int>, result: ArrayList<List<Int>>){
+    if (sum > target){
+      return
+    }
+    if (sum == target){
+      result.add(list.toList())
+      return
+    }
+    for (i in index until candidates.size){
+      list.addLast(candidates[i])
+      getSample(candidates, target, i, sum + candidates[i], list, result)
+      list.removeLast()
+    }
+  }
+
+  fun rotate(matrix: Array<IntArray>): Unit {
+    for (layerNum in 0 until matrix.size / 2){
+      var row = layerNum
+      var column = layerNum
+      val rotateCount = matrix.size - layerNum * 2 - 1 // 3个数
+      for (i in 0 until rotateCount){
+        var tempRow = row
+        var tempColumn = column + i
+        var lastValue = matrix[tempRow][tempColumn]
+        repeat(4){
+          val newRow = tempColumn
+          val newColumn =  matrix.size - 1 - tempRow
+          val tempValue = matrix[newRow][newColumn]
+          matrix[newRow][newColumn] = lastValue
+          lastValue = tempValue
+          tempRow = newRow
+          tempColumn = newColumn
+        }
+      }
+    }
+  }
+
+  fun permute(nums: IntArray): List<List<Int>> {
+    var result = ArrayList<List<Int>>()
+    result.add(ArrayList())
+    for (num in nums){
+      val tempResult = ArrayList<List<Int>>()
+      for (list in result){
+        for (i in 0..list.size){
+          val tempList = ArrayList<Int>()
+          tempList.addAll(list)
+          tempList.add(i, num)
+          tempResult.add(tempList)
+        }
+      }
+      result = tempResult
+    }
+    return result
+  }
+
+  fun subsets(nums: IntArray): List<List<Int>> {
+    val result = arrayListOf<List<Int>>()
+    result.add(arrayListOf())
+    genSubList(nums, 0, result)
+    return result
+  }
+
+  fun genSubList(nums: IntArray, index: Int, result: ArrayList<List<Int>>){
+    if (index >= nums.size) return
+    val current = nums[index]
+    genSubList(nums, index + 1, result)
+    val tempRes = arrayListOf<List<Int>>()
+    result.forEach {
+      val tempArray = arrayListOf(current)
+      tempArray.addAll(it)
+      tempRes.add(tempArray)
+    }
+    result.addAll(tempRes)
+  }
+
+  fun trap(height: IntArray): Int {
+    val maxRights = IntArray(height.size)
+    var maxRight = 0
+    for (i in height.size - 1 downTo 0){
+      maxRight = Math.max(maxRight, height[i])
+      maxRights[i] = maxRight
+    }
+
+    var maxLeft = 0
+    var sum = 0
+    for (i in height.indices){
+      val max = Math.min(maxLeft, maxRights[i])
+      if (max > height[i]){
+        sum += max - height[i]
+      }
+      maxLeft = Math.max(maxLeft, height[i])
+    }
+    return sum
   }
 
   fun subarraySum(nums: IntArray, k: Int): Int {
